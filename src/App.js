@@ -1,10 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import "./styles.css";
 
+import Header from './components/Header';
+
+import api from "./services/api";
+
 function App() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    api.get('projects').then(response => {
+      setProjects(response.data);
+    });
+  }, []);
+
   async function handleAddRepository() {
-    // TODO
+
+    const response = await api.post('projects', {
+      title: 'Front-end React',
+      owner: 'Alexei Abianna'
+    });
+
+    const project = response.data;
+
+    setProjects([...projects, project]);
   }
 
   async function handleRemoveRepository(id) {
@@ -12,6 +32,13 @@ function App() {
   }
 
   return (
+    <>
+    <Header title="Projects" />
+
+    <ul>
+      {projects.map(project => <li key={project.id}>{project.title}</li>)}
+    </ul>
+
     <div>
       <ul data-testid="repository-list">
         <li>
@@ -23,8 +50,9 @@ function App() {
         </li>
       </ul>
 
-      <button onClick={handleAddRepository}>Adicionar</button>
+      <button type="button" onClick={handleAddRepository}>Adicionar</button>
     </div>
+    </>
   );
 }
 
